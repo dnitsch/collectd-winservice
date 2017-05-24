@@ -1,0 +1,21 @@
+﻿{
+
+  "counters": [
+    {
+      "name": "Web Service",
+      "instance": [ "Bytes Received/sec", "Bytes Sent/sec", "Connection Attempts/sec", "Current Connections", "Current Blocked Async I/O Requests", "Current Connections", "Total Options Requests", "Total Put Requests", "Total Post Requests", "Total Get Requests", "Total Delete Requests" ]
+    },
+    {
+      "name": "Processor",
+      "instance": [ "% Processor Time", "% User Time", "% Privileged Time", "Interrupts/sec", "% DPC Time","% Interrupt Time","% Idle Time","% C1 Time" ]
+    },
+    {
+      "name": "PhysicalDisk",
+      "instance": ["Current Disk Queue Length","% Disk Time","Avg. Disk Queue Length","% Disk Read Time","Avg. Disk Read Queue","% Disk Write Time","Avg. Disk Write Queue"]
+    },
+    {
+      "name": "Memory",
+      "instance": [""]
+    }
+  ]
+}
