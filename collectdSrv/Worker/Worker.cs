@@ -25,6 +25,7 @@ namespace collectdSrv.Worker
         public string machineName = Environment.MachineName;
 
         public string[] instances { get; set; }
+        public string nowTime = String.Empty;
 
         DataInputObj _dio { get; set; }
 
@@ -72,8 +73,11 @@ namespace collectdSrv.Worker
 
                     instances = pcc.GetInstanceNames();
 
+                    //Time Generator can happen once per counter
+                    nowTime = ISODateNow();
+
                     //
-                    foreach( var instance in instances)
+                    foreach ( var instance in instances)
                     {
 
 
@@ -87,7 +91,7 @@ namespace collectdSrv.Worker
                     {
                             ///filter the list of counters to ones we want
                             /// based on properties input and parsing into a Model.Request sharedinput
-                        int position = Array.IndexOf(xyz.instance, counters[objX].CounterName);
+                        int position = Array.IndexOf(xyz.counterName, counters[objX].CounterName);
 
                         if (position > -1)
                         {
@@ -98,7 +102,7 @@ namespace collectdSrv.Worker
                             singleMetric.interval = sleeper;
                             singleMetric.plugin = categoryConverter(counters[objX].CategoryName);
                             singleMetric.plugin_instance = counters[objX].InstanceName;
-                            singleMetric.time = 1;
+                            singleMetric.time = nowTime;
                             singleMetric.type_instance = Convert.ToString(counters[objX].CounterName);
                             singleMetric.type = "gauge";
                             singleMetric.values = Convert.ToInt64(counters[objX].RawValue);
@@ -136,7 +140,7 @@ namespace collectdSrv.Worker
             }
 
         /// <summary>
-        /// helper method 
+        /// helper method for category converter to kleep unity between unix and windows generated stats 
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -173,91 +177,14 @@ namespace collectdSrv.Worker
 
         }
 
+        /// <summary>
+        /// helper method spits out ISO formatted string 
+        /// </summary>
+        /// <returns>string </returns>
+        public string ISODateNow()
+        {
+            string isoDateNow = DateTime.UtcNow.ToString("O");
+            return isoDateNow;
         }
-
+    }
 }
-
-
-/// <summary>
-/// 
-/// </summary>
-//// public ResponseBody collectWorker(string message, string innerException, string stackTrace)
-//public void collectWorker()
-//{
-
-
-
-
-
-//// Create the appropriate PerformanceCounterCategory object.
-//// foreach key in AppConfig
-
-//pcc = new PerformanceCounterCategory(categoryName, machineName);
-
-
-
-// instances = pcc.GetInstanceNames();
-
-// Get the counters for this instance or a single instance 
-// of the selected category.
-
-
-//int objY;
-
-
-//for (objY = 0; objY < instances.Length; objY++)
-//{
-//    instanceName = instances[objY];
-
-//    counters = pcc.GetCounters(instanceName);
-
-//    // Display a numbered list of the counter names.
-//    int objX;
-//    for (objX = 0; objX < counters.Length; objX++)
-//    {
-//        //Console.WriteLine("{0,4} - {1}", objX + 1, counters[objX].CounterName);
-//        Console.WriteLine(String.Format("This counter {3} exist in instance {1} of  category {0}  on {2}",
-//                    categoryName, instanceName, machineName, counters[objX].CounterName));
-//    }
-//}
-
-
-
-
-
-
-//res = invoker.collectd(mainCounter);
-
-//if (res.OK == "false")
-//{
-//    return res;
-
-//}
-
-//return res;
-
-//}
-//catch (Exception ex)
-//{
-//    throw ex;
-//}
-//finally {
-//    mainCounter = null;
-//    singleMetric = null;
-//    res = null;
-//}
-
-
-//        }
-//}
-
-//    }
-//string[] perf_name = { "Web Service", "PhysicalDisk", "Processor" };
-//string[] instanceType = { "Bytes Received/sec" , "Bytes Sent/sec","Connection Attempts/sec","Current Connections","Current Blocked Async I/O Requests","Current Connections",
-//                "Total Options Requests","Total Put Requests","Total Post Requests","Total Get Requests","Total Delete Requests",
-//                "Current Disk Queue Length","% Disk Time","Avg. Disk Queue Length","% Disk Read Time","Avg. Disk Read Queue","% Disk Write Time","Avg. Disk Write Queue",
-//                "% Processor Time","% User Time","% Privileged Time","Interrupts/sec","% DPC Time","% Interrupt Time","% Idle Time"
-//                //,"% C1 Time"
-//            };
-
-

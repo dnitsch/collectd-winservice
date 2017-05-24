@@ -13,7 +13,7 @@ namespace collectdSrv.Model.Request
             public Int64 values { get; set; }
             public string[] dstypes { get; set; }
             public string[] dsnames { get; set; }
-            public int time { get; set; }
+            public string time { get; set; }
             public int interval { get; set; }
             public string host { get; set; }
             public string plugin { get; set; }

@@ -17,10 +17,7 @@ namespace collectdSrv.Service
         private static RestClient instance;
         //public CollectorMain  CollectD;
         public ResponseBody ReponseParsed;
-        public static string baseUrl =  ConfigurationManager.AppSettings["loggerRestBaseUrl"].ToString();  //"http://receiver.collect.pcdev.net/collectd"; // 
-
-                                                                                                ///public static string version = ConfigurationManager.AppSettings["loggerRestMethodVersion"].ToString();
-
+        public static string baseUrl =  ConfigurationManager.AppSettings["loggerRestBaseUrl"].ToString(); 
         protected static RestClient RestClientInstance
             {
                 get

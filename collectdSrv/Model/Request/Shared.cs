@@ -10,7 +10,7 @@ namespace collectdSrv.Model.Request
     public class Counter
     {
         public string name { get; set; }
-        public string[] instance { get; set; }
+        public string[] counterName { get; set; }
     }
 
 
@@ -18,6 +18,4 @@ namespace collectdSrv.Model.Request
     {
         public Counter[] counters { get; set; }
     }
-
-
 }
