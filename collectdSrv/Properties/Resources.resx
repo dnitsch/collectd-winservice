@@ -117,31 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Configuration" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Configuration\Configuration.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="ExternalConstants" xml:space="preserve">
-    <value>{
-
-  "counters": [
-    {
-      "name": "Web Service",
-      "counterName": [ "Bytes Received/sec", "Bytes Sent/sec", "Connection Attempts/sec", "Current Connections", "Current Blocked Async I/O Requests", "Current Connections", "Total Options Requests", "Total Put Requests", "Total Post Requests", "Total Get Requests", "Total Delete Requests" ]
-    },
-    {
-      "name": "Processor",
-      "counterName": [ "% Processor Time", "% User Time", "% Privileged Time", "Interrupts/sec", "% DPC Time","% Interrupt Time","% Idle Time","% C1 Time" ]
-    },
-    {
-      "name": "PhysicalDisk",
-      "counterName": ["Current Disk Queue Length","% Disk Time","Avg. Disk Queue Length","% Disk Read Time","Avg. Disk Read Queue","% Disk Write Time","Avg. Disk Write Queue"]
-    },
-    {
-      "name": "Memory",
-      "counterName": [""]
-    }
-  ]
-}</value>
-  </data>
 </root>

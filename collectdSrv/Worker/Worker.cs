@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using RestSharp;
-using System.Configuration;
-using System.Threading.Tasks;
+//using System.IO;
+//using System.Linq;
+//using System.Text;
+//using RestSharp;
+//using System.Configuration;
+//using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Reflection;
+//using System.Reflection;
 
 namespace collectdSrv.Worker
 {
@@ -15,6 +15,8 @@ namespace collectdSrv.Worker
     using Model.Request;
     using Model.Response;
     using Configuration;
+    using System.Text.RegularExpressions;
+
     public class Worker
     {
 
@@ -25,10 +27,9 @@ namespace collectdSrv.Worker
         public string machineName = Environment.MachineName;
 
         public string[] instances { get; set; }
-        public string nowTime = String.Empty;
 
         DataInputObj _dio { get; set; }
-
+        List<Counter> _dioCounter { get; set; }
         //public string[] categories { get; set; }
 
         PerformanceCounterCategory pcc; // = new PerformanceCounterCategory();
@@ -37,25 +38,27 @@ namespace collectdSrv.Worker
         /// <summary>
         /// .ctor creates an instance of the input categories and instances for the looping below
         /// </summary>
-        public Worker(DataInputObj dio) {
-
+        public Worker(DataInputObj dio)
+        {
             _dio = dio;
-
         }
 
+        public Worker(List<Counter> dioCounter)
+        {
+            _dioCounter = dioCounter;
+        }
 
         /// <summary>
         /// runs the perfcounter .net caller
         /// </summary>
         /// <param name="sleeper"></param>
         /// <returns></returns>
-        public ResponseBody createCollectD (Int32 sleeper) {
+        public ResponseBody createCollectD(Int32 sleeper)
+        {
             ///
             //TODO
             /// turn into dynamic source
             /// Deprecated using app.config and moved to resources 
-            // PerfCounterConfigurationSection
-            //var confSection = ConfigurationManager.GetSection("externalConstants");  //perf_counters
 
             ResponseBody res = new ResponseBody();
             List<CollectD> mainCounter = new List<CollectD>();
@@ -66,88 +69,127 @@ namespace collectdSrv.Worker
             try
             {
 
-                foreach( var xyz in _dio.counters)
+                foreach (var xyz in _dio.counters)
                 {
-                    //int z;
-                    pcc = new PerformanceCounterCategory(xyz.name, machineName);
+                    pcc = new PerformanceCounterCategory(xyz.name, machineName); //
 
                     instances = pcc.GetInstanceNames();
 
-                    //Time Generator can happen once per counter
-                    nowTime = ISODateNow();
-
-                    //
-                    foreach ( var instance in instances)
+                    foreach (var instance in instances)
                     {
 
+                        ///
+                        /// if instanceName array exists
+                        /// we need to filter through 
+                        /// else we contintue only based on countername filters
+                        /// 
 
-                  
-                    counters = pcc.GetCounters(instance);
-
-                    
-                    // Display a numbered list of the counter names.
-                    int objX;
-                    for (objX = 0; objX < counters.Length; objX++)
-                    {
-                            ///filter the list of counters to ones we want
-                            /// based on properties input and parsing into a Model.Request sharedinput
-                        int position = Array.IndexOf(xyz.counterName, counters[objX].CounterName);
-
-                        if (position > -1)
+                        if (xyz.instanceName.Length > 0)
                         {
-                            CollectD singleMetric = new CollectD();
-                            singleMetric.host = machineName;
-                            singleMetric.dstypes = dstype;
-                            singleMetric.dsnames = dsname;
-                            singleMetric.interval = sleeper;
-                            singleMetric.plugin = categoryConverter(counters[objX].CategoryName);
-                            singleMetric.plugin_instance = counters[objX].InstanceName;
-                            singleMetric.time = nowTime;
-                            singleMetric.type_instance = Convert.ToString(counters[objX].CounterName);
-                            singleMetric.type = "gauge";
-                            singleMetric.values = Convert.ToInt64(counters[objX].RawValue);
 
-                            mainCounter.Add(singleMetric);
-                            //Console.WriteLine(String.Format("This counter {3} exist in instance {1} of  category {0}  on {2}",
-                            //           counters[objX].CategoryName, counters[objX].InstanceName, machineName, counters[objX].CounterName));
+                            foreach (string spqr in xyz.instanceName)
+                            {
+                                if (instance.Contains(spqr))
+                                {
+                                    counters = pcc.GetCounters(instance);
+                                    foreach (var counter in counters)
+                                    {
+
+                                        if (instance.Contains(spqr))
+                                        {
+                                            int position = Array.IndexOf(xyz.counterName, counter.CounterName);
+
+                                            if (position > -1)
+                                            {
+                                                //Console.WriteLine(counter.CategoryName);
+                                                CollectD singleMetric = new CollectD();
+                                                singleMetric.host = machineName;
+                                                singleMetric.dstypes = dstype;
+                                                singleMetric.dsnames = dsname;
+                                                singleMetric.interval = sleeper;
+                                                singleMetric.plugin = categoryConverter(counter.CategoryName);
+                                                singleMetric.plugin_instance = counter.InstanceName;
+                                                singleMetric.time = 1;
+                                                singleMetric.type_instance = Convert.ToString(counter.CounterName);
+                                                singleMetric.type = "gauge";
+                                                singleMetric.values = Convert.ToInt64(counter.RawValue);
+                                                mainCounter.Add(singleMetric);
+
+                                                if (counter.CategoryName == "Process")
+                                                {
+                                                    Console.Write("" + counter.InstanceName + "\n");
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                }
+
+                            }
                         }
-                    }
-                // end instance loop
+                        else
+                        {
+
+                            counters = pcc.GetCounters(instance);
+                            // Display a numbered list of the counter names.
+                            int objX;
+                            for (objX = 0; objX < counters.Length; objX++)
+                            {
+                                ///filter the list of counters to ones we want
+                                /// based on properties input and parsing into a Model.Request sharedinput
+                                int position = Array.IndexOf(xyz.counterName, counters[objX].CounterName);
+
+                                if (position > -1)
+                                {
+                                    CollectD singleMetric = new CollectD();
+                                    singleMetric.host = machineName;
+                                    singleMetric.dstypes = dstype;
+                                    singleMetric.dsnames = dsname;
+                                    singleMetric.interval = sleeper;
+                                    singleMetric.plugin = categoryConverter(counters[objX].CategoryName);
+                                    singleMetric.plugin_instance = counters[objX].InstanceName;
+                                    singleMetric.time = 1;
+                                    singleMetric.type_instance = Convert.ToString(counters[objX].CounterName);
+                                    singleMetric.type = "gauge";
+                                    singleMetric.values = Convert.ToInt64(counters[objX].RawValue);
+                                    mainCounter.Add(singleMetric);
+                                }
+                            }
+                        }
+                        // end instance loop
                     }
                 }
+                if (Environment.UserInteractive)
+                {
+                    Console.WriteLine("total rows: " + mainCounter.Count + "");
 
-
+                }
                 res = invoker.collectd(mainCounter);
 
                 return res;
             }
             catch (Exception e)
             {
-                res.Message = "error";
-                res.OK = false;
-                res.ResponseData = e.Message;
-
-                return res;
+                throw e;
             }
-            finally {
-
+            finally
+            {
                 mainCounter = null;
-              
-
             }
-
-
-            }
+        }
 
         /// <summary>
-        /// helper method for category converter to kleep unity between unix and windows generated stats 
+        /// helper method to normalise data across OS types/versions
+        /// collectd on linux provides: disk, cpu, memory, aggregation
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public string categoryConverter(string input) {
+        public string categoryConverter(string input)
+        {
             string output = String.Empty;
 
-            switch (input.ToLower()) {
+            switch (input.ToLower())
+            {
                 case "physicaldisk":
                     output = "disk";
                     break;
@@ -160,14 +202,30 @@ namespace collectdSrv.Worker
                 case "processor":
                     output = "cpu";
                     break;
-
                 case "web service":
                     output = "iis";
                     break;
                 case "network interface":
                     output = "network";
                     break;
-
+                case "process":
+                    output = "process";
+                    break;
+                //case ".NET CLR Memory":
+                //    output = "process";
+                //    break;
+                //case ".NET CLR LocksAndThreads":
+                //    output = "process";
+                //    break;
+                case "W3SVC_W3WP":
+                    output = "iis";
+                    break;
+                case "HTTP Service":
+                    output = "iis";
+                    break;
+                case "HTTP Service Request Queues":
+                    output = "iis";
+                    break;
                 default:
                     output = "unassigned";
                     break;
@@ -178,13 +236,17 @@ namespace collectdSrv.Worker
         }
 
         /// <summary>
-        /// helper method spits out ISO formatted string 
+        /// ISODate creates a TSDB friendly timestamp 
         /// </summary>
-        /// <returns>string </returns>
+        /// <returns>ISO date string 
+        /// @isoDateNow (String)
+        /// </returns>
         public string ISODateNow()
         {
             string isoDateNow = DateTime.UtcNow.ToString("O");
             return isoDateNow;
         }
+
     }
+
 }

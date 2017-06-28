@@ -59,33 +59,5 @@ namespace collectdSrv.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] Configuration {
-            get {
-                object obj = ResourceManager.GetObject("Configuration", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {
-        ///
-        ///  &quot;counters&quot;: [
-        ///    {
-        ///      &quot;name&quot;: &quot;Web Service&quot;,
-        ///      &quot;counterName&quot;: [ &quot;Bytes Received/sec&quot;, &quot;Bytes Sent/sec&quot;, &quot;Connection Attempts/sec&quot;, &quot;Current Connections&quot;, &quot;Current Blocked Async I/O Requests&quot;, &quot;Current Connections&quot;, &quot;Total Options Requests&quot;, &quot;Total Put Requests&quot;, &quot;Total Post Requests&quot;, &quot;Total Get Requests&quot;, &quot;Total Delete Requests&quot; ]
-        ///    },
-        ///    {
-        ///      &quot;name&quot;: &quot;Processor&quot;,
-        ///      &quot;counterName&quot;: [ &quot;% Processor Time&quot;, &quot;% User Time&quot;, &quot;% Privileged Time&quot;, &quot;Interrupts/sec&quot;, &quot;% DPC Time&quot;,&quot;% Interrupt Ti [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string ExternalConstants {
-            get {
-                return ResourceManager.GetString("ExternalConstants", resourceCulture);
-            }
-        }
     }
 }

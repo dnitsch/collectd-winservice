@@ -11,11 +11,14 @@ namespace collectdSrv.Model.Request
     {
         public string name { get; set; }
         public string[] counterName { get; set; }
+        public string[] instanceName { get; set; }
     }
 
 
     public class DataInputObj
     {
-        public Counter[] counters { get; set; }
+        public List<Counter> counters { get; set; }
     }
+
+
 }
