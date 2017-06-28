@@ -57,8 +57,16 @@ namespace collectdSrv.Service
                     request.AddParameter("application/json; charset=utf-8", request.JsonSerializer.Serialize(collectorObj), ParameterType.RequestBody);
 
                     IRestResponse<ResponseBody> response = client.Execute<ResponseBody>(request);
-                    returnObj = response.Data;
 
+                    if ((Convert.ToInt32(response.StatusCode) >= 200) && (Convert.ToInt32(response.StatusCode) < 300))
+                    {
+                        returnObj = response.Data;
+                    }
+                    else {
+               
+                        throw response.ErrorException;
+                    }
+         
                 }
 
             return returnObj;

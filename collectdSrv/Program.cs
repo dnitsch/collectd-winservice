@@ -1,5 +1,5 @@
 ﻿using System;
-using RestSharp;
+using System.Configuration;
 using System.Threading.Tasks;
 
 namespace collectdSrv
@@ -7,7 +7,11 @@ namespace collectdSrv
 
     using Model.Request;
     using Model.Response;
+    using Configuration;
     using Properties;
+    using RestSharp;
+    using System.Text;
+    using System.Collections.Generic;
 
     public class Program
     {
@@ -15,28 +19,31 @@ namespace collectdSrv
 
         /// <summary>
         /// entry point into the console app cum service
+        /// load the app config settings once and use them with each interval
         /// </summary>
-        /// <param name="args"></param>
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
+            
+            DataInputObj dio = new DataInputObj();
+            List<Counter> dioCounter = new List<Counter>();
+            PerfCounterConfigurationSection countersConf = ConfigurationManager.GetSection("performanceCounters") as PerfCounterConfigurationSection;
 
-            ///
-            /// load the DataInputObject once
-            ///
+            foreach (CounterConfig single in countersConf.Counters)
+            {
+                Counter singleCounter = new Counter();
 
-            DataInputObj dio = SimpleJson.DeserializeObject<DataInputObj>(Resources.ExternalConstants);
+                singleCounter.name = single.Name;
+                singleCounter.counterName = single.CounterName.Split(',');
+                singleCounter.instanceName = single.InstanceName.Split(',');
+                dioCounter.Add(singleCounter);
+            }
 
-            int sleepInterval = (args.Length == 0) ? 60 : Convert.ToInt32(args[0]);
+            dio.counters = dioCounter;
 
-            ///
-            /// initialize the constructor with DIO
-            ///
+            int sleepInterval = (args.Length == 0) ? 1 : Convert.ToInt32(args[0]);
             Worker.Worker Wrker = new Worker.Worker(dio);
-         
             try {
-
-
                 do
                 {
                     var stopper = Task.Run(async delegate
@@ -49,18 +56,22 @@ namespace collectdSrv
 
                         });
                     stopper.Wait();
-                 /// quit if not running as service
-
+                 
                 } while (!(Environment.UserInteractive));
-
 
             }
             catch (Exception e)
             {
-                ///proper logging needs to be implemented here
+                ///proper logging should be implemented here
                 ///
-                Console.WriteLine(e.InnerException);
+                if (Environment.UserInteractive)
+                {
+                    Console.WriteLine("Message: " + e.Message + "");
+                    Console.WriteLine("InnerException: " + e.InnerException + "");
+                    Console.WriteLine("Stack: " + e.StackTrace + "");
+                    Console.ReadLine();
 
+                }
             }
 
         }
@@ -68,21 +79,3 @@ namespace collectdSrv
     }
 
 }
-
-
-
-
-//if (res.OK)
-//{
-
-//    Thread.Sleep(sleepInterval);
-
-//}
-//else {
-
-
-//    Environment.Exit(1);
-
-//}
-
-//} while (1 == 1);
